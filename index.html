@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seu Ciclo, Seu Poder - Guia, Calendário e Comunidade</title>
+    <!-- Carrega Tailwind CSS para estilização rápida e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Importa Chart.js para o gráfico de resumo -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        /* Define a fonte Inter como padrão */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC; /* Fundo muito claro */
+            padding-bottom: 80px; /* Espaço para a barra de navegação inferior */
+        }
+        /* Cores das Fases do Ciclo */
+        .color-menstruacao { background-color: #E91E63; } /* Rosa forte */
+        .color-folicular { background-color: #2196F3; } /* Azul claro */
+        .color-ovulacao { background-color: #4CAF50; } /* Verde vibrante */
+        .color-lutea { background-color: #FF9800; } /* Laranja */
+        .gradient-header {
+            background: linear-gradient(135deg, #FF6F91 0%, #FFC7D8 100%);
+        }
+        .module-card {
+            transition: all 0.3s ease;
+        }
+        .module-icon-container {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .content-hidden {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .content-visible {
+            max-height: 2000px; /* Valor grande para animar a altura */
+        }
+        /* Estilos para a Barra de Navegação Fixa */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            box-shadow: 0 -4px 6px -1px rgb(0 0 0 / 0.1), 0 -2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        /* Estilos específicos para o Calendário */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+        .calendar-day {
+            min-height: 50px;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.15s;
+            position: relative;
+        }
+        .day-number {
+            font-weight: 600;
+            font-size: 0.875rem; /* sm:text-sm */
+            line-height: 1.25rem;
+        }
+        .flow-mark {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-top: 2px;
+            z-index: 10;
+        }
+        .flow-menstruacao { background-color: #E91E63; } /* Rosa Forte (Início) */
+        .flow-medium { background-color: #F472B6; } /* Pink-400 (Forte/Médio) */
+        .flow-light { background-color: #F9A8D4; } /* Pink-300 (Leve) */
+        .is-today {
+            border: 2px solid #E91E63; /* Destaque Rosa */
+        }
+
+        /* FAB para a Comunidade */
+        .fab {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            z-index: 40;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* Estilos para Formulário de Perfil */
+        .profile-label {
+            @apply block text-sm font-medium text-gray-700 mb-1;
+        }
+        .profile-input {
+            @apply w-full border-gray-300 rounded-lg shadow-sm focus:border-pink-500 focus:ring-pink-500 p-2 text-sm;
+        }
+        .profile-toggle {
+            @apply relative inline-flex items-center h-6 rounded-full w-11 transition-colors;
+        }
+        .profile-toggle-handle {
+            @apply inline-block w-4 h-4 transform bg-white rounded-full transition-transform;
+        }
+        .profile-section {
+            @apply bg-white p-5 rounded-xl shadow-lg mb-6;
+        }
+    </style>
+</head>
+<body class="selection:bg-pink-200">
+
+<!-- Cabeçalho Principal (Gradient Novo) -->
+<header class="gradient-header p-6 pb-16 rounded-b-3xl shadow-xl text-white">
+    <div class="max-w-md mx-auto">
+        <h1 class="text-3xl font-extrabold mb-1">Seu Ciclo, Seu Poder</h1>
+        <p class="text-sm opacity-90" id="header-subtitle">Um guia amigável para entender tudo sobre a sua primeira menstruação e seu corpo.</p>
+    </div>
+</header>
+
+<div id="main-content-container" class="max-w-md mx-auto px-4 -mt-10">
+
+    <!-- VISUALIZAÇÃO DO GUIA (Início) -->
+    <div id="guide-view" class="view-content">
+        <!-- ... Conteúdo do Guia (Não alterado) ... -->
+
+        <!-- Bloco de Visualização do Ciclo -->
+        <div class="bg-white p-5 rounded-xl shadow-2xl mb-6 phase-bar-active">
+            <h2 class="text-lg font-bold text-pink-600 mb-4 flex items-center justify-between">
+                Fase Atual: <span id="current-phase-display" class="font-extrabold text-xl text-pink-700">Menstruação (Dia 1-7)</span>
+            </h2>
+
+            <!-- Diagrama de Fases (Horizontal) -->
+            <div class="flex flex-col space-y-3">
+                <!-- Fase 1: Menstruação -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-24 text-sm font-medium text-pink-600">Menstruação</div>
+                    <div class="flex-1 h-3 rounded-full phase-bar overflow-hidden">
+                        <div id="bar-menstruacao" class="h-full color-menstruacao transition duration-700 ease-out" style="width: 25%;"></div>
+                    </div>
+                    <span class="text-base text-pink-600 font-bold">🩸</span>
+                </div>
+                <!-- Fase 2: Folicular -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-24 text-sm font-medium text-gray-500">Folicular</div>
+                    <div class="flex-1 h-3 rounded-full phase-bar overflow-hidden">
+                        <div id="bar-folicular" class="h-full color-folicular transition duration-700 ease-out" style="width: 0;"></div>
+                    </div>
+                    <span class="text-base text-gray-400">💧</span>
+                </div>
+                <!-- Fase 3: Ovulação -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-24 text-sm font-medium text-gray-500">Ovulação</div>
+                    <div class="flex-1 h-3 rounded-full phase-bar overflow-hidden">
+                        <div id="bar-ovulacao" class="h-full color-ovulacao transition duration-700 ease-out" style="width: 0;"></div>
+                    </div>
+                    <span class="text-base text-gray-400">🌱</span>
+                </div>
+                <!-- Fase 4: Lútea -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-24 text-sm font-medium text-gray-500">Lútea</div>
+                    <div class="flex-1 h-3 rounded-full phase-bar overflow-hidden">
+                        <div id="bar-lutea" class="h-full color-lutea transition duration-700 ease-out" style="width: 0;"></div>
+                    </div>
+                    <span class="text-base text-gray-400">☁️</span>
+                </div>
+            </div>
+
+            <!-- Legenda -->
+            <p class="text-xs text-gray-500 mt-4 text-center">O diagrama mostra onde você está no ciclo. Clique no Módulo 1 para ver os detalhes das fases.</p>
+        </div>
+
+        <!-- Conteúdo Principal - Módulos Acordeão (Módulos 1-5) -->
+        <div id="module-container" class="space-y-4">
+
+            <!-- MÓDULO 1: O CICLO SEM MISTÉRIO -->
+            <div class="module-card rounded-xl shadow-md bg-white border border-pink-100">
+                <button onclick="toggleModule('module-1')" class="w-full p-4 flex items-center justify-between text-left focus:outline-none">
+                    <div class="flex items-center space-x-3">
+                        <div class="module-icon-container rounded-full bg-pink-100 text-pink-600">
+                            <span class="text-xl">🩸</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-lg text-gray-800">MÓDULO 1: O CICLO SEM MISTÉRIO</p>
+                            <p class="text-xs text-gray-500">Duração Normal: 21-35 dias.</p>
+                        </div>
+                    </div>
+                    <span class="text-2xl font-light text-gray-400 transform transition duration-300" id="icon-module-1">+</span>
+                </button>
+                <div id="module-1" class="content-hidden px-4 pb-4">
+                    <div class="pt-4 border-t border-gray-100 space-y-4 text-gray-700">
+                        <p class="text-sm font-semibold">O que é o Ciclo?</p>
+                        <p class="text-sm leading-relaxed border-l-4 border-pink-400 pl-3 bg-pink-50/50 p-2 rounded-md">
+                            "O ciclo menstrual começa no primeiro dia da sua menstruação e vai até o dia anterior à próxima. Seu corpo se prepara para uma possível gravidez a cada mês. Se ela não acontece, ele 'limpa a casa' e o sangramento vem. Duração Normal: 21 a 35 dias."
+                        </p>
+                        <!-- Sub-cards para as Fases -->
+                        <div class="space-y-3 pt-2">
+                            <div class="p-3 rounded-lg bg-pink-50 border-l-4 border-pink-600 shadow-sm phase-selector" data-phase-id="menstruacao" data-phase-name="Menstruação (Dia 1-7)">
+                                <p class="font-bold text-pink-600 flex items-center">
+                                    <span class="mr-2">🔴</span> Menstruação
+                                </p>
+                                <p class="text-xs mt-1">É a descamação da camada interna do seu útero (endométrio). Dica: Não é sangue 'sujo'! É apenas um tecido que seu corpo não precisava mais. A duração costuma ser de 3 a 7 dias.</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-blue-50 border-l-4 border-blue-600 shadow-sm phase-selector" data-phase-id="folicular" data-phase-name="Folicular (Dia 8-13)">
+                                <p class="font-bold text-blue-600 flex items-center">
+                                    <span class="mr-2">💧</span> Folicular (Pré-Ovulação)
+                                </p>
+                                <p class="text-xs mt-1">Seu corpo está produzindo estrogênio e preparando um óvulo. Muitas vezes você se sente com mais energia, disposta e com mais foco.</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-green-50 border-l-4 border-green-600 shadow-sm phase-selector" data-phase-id="ovulacao" data-phase-name="Ovulação (Dia 14)">
+                                <p class="font-bold text-green-600 flex items-center">
+                                    <span class="mr-2">🌱</span> Ovulação
+                                </p>
+                                <p class="text-xs mt-1">O óvulo é liberado. É o ""ápice"" do seu ciclo, e você pode notar um muco vaginal mais transparente e elástico neste período.</p>
+                            </div>
+                            <div class="p-3 rounded-lg bg-orange-50 border-l-4 border-orange-600 shadow-sm phase-selector" data-phase-id="lutea" data-phase-name="Lútea (Dia 15-28)">
+                                <p class="font-bold text-orange-600 flex items-center">
+                                    <span class="mr-2">☁️</span> Lútea (Pré-Menstrual)
+                                </p>
+                                <p class="text-xs mt-1">O hormônio progesterona domina aqui. É normal sentir mais sono, inchaço e algumas mudanças de humor (TPM). Seu corpo está guardando energia.</p>
+                            </div>
+                        </div>
+
+                        <!-- Sinais de Alerta -->
+                        <div class="bg-red-50 p-4 rounded-lg border-2 border-red-300 shadow-inner">
+                            <p class="font-bold text-red-700 flex items-center mb-2">
+                                🚨 Sinais de Alerta (Quando procurar o Enfermeiro?)
+                            </p>
+                            <ul class="text-xs space-y-1 list-disc list-inside ml-2">
+                                <li>
+                                    <span class="font-semibold">Fluxo Muito Forte:</span> Precisa trocar absorvente de hora em hora por mais de 4 horas seguidas.
+                                </li>
+                                <li>
+                                    <span class="font-semibold">Dor Incapacitante:</span> Cólica que não passa com remédio ou te impede de ir à aula/trabalho, ou que te faz vomitar.
+                                </li>
+                                <li>
+                                    <span class="font-semibold">Ciclos Extremos:</span> Ciclo com menos de 21 dias ou mais de 35 dias, de forma persistente.
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÓDULO 2: BEM-ESTAR E EMOÇÕES -->
+            <div class="module-card rounded-xl shadow-md bg-white border border-purple-100">
+                <button onclick="toggleModule('module-2')" class="w-full p-4 flex items-center justify-between text-left focus:outline-none">
+                    <div class="flex items-center space-x-3">
+                        <div class="module-icon-container rounded-full bg-purple-100 text-purple-600">
+                            <span class="text-xl">🧘‍♀️</span>
+                        </div>
+                        <p class="font-bold text-lg text-gray-800">MÓDULO 2: BEM-ESTAR E EMOÇÕES</p>
+                    </div>
+                    <span class="text-2xl font-light text-gray-400 transform transition duration-300" id="icon-module-2">+</span>
+                </button>
+                <div id="module-2" class="content-hidden px-4 pb-4">
+                    <div class="pt-4 border-t border-gray-100 space-y-4 text-gray-700">
+
+                        <!-- Cólicas -->
+                        <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-indigo-600 shadow-sm">
+                            <p class="font-bold text-indigo-700 mb-2">Cólicas: O Que Alivia?</p>
+                            <ul class="text-xs space-y-1 ml-2">
+                                <li><span class="font-semibold">🔥 Calor:</span> Use bolsa de água quente na barriga/costas. Ajuda a relaxar os músculos do útero.</li>
+                                <li><span class="font-semibold">💊 Remédio:</span> Tome o analgésico no início do incômodo (não espere a dor ficar insuportável). Converse com o enfermeiro sobre qual é o mais indicado.</li>
+                                <li><span class="font-semibold">🧘‍♀️ Movimento:</span> Alongamentos suaves e caminhadas leves podem ajudar a relaxar.</li>
+                            </ul>
+                        </div>
+
+                        <!-- TPM/TDPM -->
+                        <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-600 shadow-sm">
+                            <p class="font-bold text-purple-700 mb-2">TPM vs. TDPM (Transtorno Disfórico Pré-Menstrual)</p>
+                            <p class="text-xs leading-relaxed">
+                                "É normal sentir-se diferente (irritada, cansada) antes da menstruação. Se as emoções ou a ansiedade forem tão fortes que atrapalham seus estudos ou sua vida social, chame isso de TDPM. Nesses casos, converse com o enfermeiro ou um psicólogo."
+                            </p>
+                        </div>
+
+                        <!-- Nutrição -->
+                        <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-600 shadow-sm">
+                            <p class="font-bold text-yellow-700 mb-2">Nutrição e Seu Humor</p>
+                            <ul class="text-xs space-y-1 ml-2">
+                                <li><span class="font-semibold">Beba Água:</span> Ajuda a reduzir o inchaço e a retenção de líquido da fase pré-menstrual.</li>
+                                <li><span class="font-semibold">Coma Ferro:</span> Durante o fluxo, alimentos ricos em ferro (carne, legumes escuros) ajudam a repor o que foi perdido e evitam a fraqueza.</li>
+                                <li><span class="font-semibold">Reduza o Sal:</span> Menos sal ajuda a reduzir o inchaço.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÓDULO 3: CUIDADOS PRÁTICOS E HIGIENE -->
+            <div class="module-card rounded-xl shadow-md bg-white border border-teal-100">
+                <button onclick="toggleModule('module-3')" class="w-full p-4 flex items-center justify-between text-left focus:outline-none">
+                    <div class="flex items-center space-x-3">
+                        <div class="module-icon-container rounded-full bg-teal-100 text-teal-600">
+                            <span class="text-xl">🧺</span>
+                        </div>
+                        <p class="font-bold text-lg text-gray-800">MÓDULO 3: CUIDADOS PRÁTICOS E HIGIENE</p>
+                    </div>
+                    <span class="text-2xl font-light text-gray-400 transform transition duration-300" id="icon-module-3">+</span>
+                </button>
+                <div id="module-3" class="content-hidden px-4 pb-4">
+                    <div class="pt-4 border-t border-gray-100 space-y-4 text-gray-700">
+
+                        <!-- Higiene -->
+                        <div class="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-600 shadow-sm">
+                            <p class="font-bold text-teal-700 mb-2">Higiene Íntima Correta</p>
+                            <ul class="text-xs space-y-1 ml-2">
+                                <li><span class="font-semibold">Como lavar:</span> Sempre de frente para trás. Use água e sabão neutro (ou sabonete íntimo) somente na parte externa.</li>
+                                <li><span class="font-semibold">O quê evitar:</span> Nunca lave o canal vaginal por dentro (ele se limpa sozinho!).</li>
+                            </ul>
+                        </div>
+
+                        <!-- Frequência -->
+                        <div class="bg-gray-100 p-4 rounded-lg border-l-4 border-gray-500 shadow-sm">
+                            <p class="font-bold text-gray-800 mb-2">Frequência de Troca</p>
+                            <p class="text-xs leading-relaxed border-l-2 border-gray-400 pl-2">
+                                <span class="font-semibold">Regra de Ouro:</span> Trocar absorvente (externo) a cada 3 a 4 horas, mesmo com pouco fluxo. Trocar a tempo evita odores e ajuda a manter a pele saudável.
+                            </p>
+                        </div>
+
+                        <!-- EcoAbsorvente -->
+                        <div class="bg-lime-50 p-4 rounded-lg border-l-4 border-lime-600 shadow-sm">
+                            <p class="font-bold text-lime-700 mb-2">Card de Produto: EcoAbsorvente de Pano</p>
+                            <p class="text-xs leading-relaxed">
+                                <span class="font-semibold">Vantagens:</span> Sustentável, econômico a longo prazo e muito confortável.
+                            </p>
+                            <p class="text-xs leading-relaxed mt-2">
+                                <span class="font-semibold text-red-500">Atenção:</span> A lavagem correta é crucial para a sua saúde! Lave-o à mão após o uso, seque-o totalmente ao sol e guarde-o em um local arejado.
+                            </p>
+                        </div>
+
+                        <!-- Descarte -->
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600 shadow-sm">
+                            <p class="font-bold text-blue-700 mb-2">Descarte Consciente</p>
+                            <ul class="text-xs space-y-1 ml-2">
+                                <li><span class="font-semibold">Onde Jogar:</span> No lixo comum. Sempre embrulhe o produto usado em papel higiênico ou na embalagem original antes de descartar.</li>
+                                <li><span class="font-semibold text-red-500">Nunca</span> jogue absorvente, papel higiênico ou outros produtos no vaso sanitário.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÓDULO 4: SEXUALIDADE E PREVENÇÃO -->
+            <div class="module-card rounded-xl shadow-md bg-white border border-red-100">
+                <button onclick="toggleModule('module-4')" class="w-full p-4 flex items-center justify-between text-left focus:outline-none">
+                    <div class="flex items-center space-x-3">
+                        <div class="module-icon-container rounded-full bg-red-100 text-red-600">
+                            <span class="text-xl">❤️</span>
+                        </div>
+                        <p class="font-bold text-lg text-gray-800">MÓDULO 4: SEXUALIDADE E PREVENÇÃO</p>
+                    </div>
+                    <span class="text-2xl font-light text-gray-400 transform transition duration-300" id="icon-module-4">+</span>
+                </button>
+                <div id="module-4" class="content-hidden px-4 pb-4">
+                    <div class="pt-4 border-t border-gray-100 space-y-4 text-gray-700">
+
+                        <!-- Alerta Contraceptivo -->
+                        <div class="bg-red-100 p-4 rounded-lg border-l-4 border-red-600 shadow-inner">
+                            <p class="font-bold text-red-700 mb-2">O Ciclo Não é Contraceptivo! (Alerta)</p>
+                            <p class="text-xs"><span class="font-semibold">Mito:</span> O ciclo menstrual regular é confiável para evitar gravidez.</p>
+                            <p class="text-xs mt-1"><span class="font-semibold">Verdade:</span> O corpo adolescente é irregular! Não use o app como um calendário contraceptivo. A única forma segura de evitar gravidez é o uso consistente de métodos.</p>
+                        </div>
+
+                        <!-- ISTs -->
+                        <div class="bg-pink-50 p-4 rounded-lg border-l-4 border-pink-600 shadow-sm">
+                            <p class="font-bold text-pink-700 mb-2">Prevenção de ISTs/Aids</p>
+                            <p class="text-xs leading-relaxed">
+                                A camisinha (masculina ou feminina) é o único método que evita as Infecções Sexualmente Transmissíveis (ISTs) e ainda ajuda a evitar gravidez. Você pode conseguir camisinhas de graça na enfermaria da escola ou no posto de saúde.
+                            </p>
+                        </div>
+
+                        <!-- Contraceptivos -->
+                        <div class="bg-gray-100 p-4 rounded-lg border-l-4 border-gray-500 shadow-sm">
+                            <p class="font-bold text-gray-800 mb-2">Métodos Contraceptivos</p>
+                            <p class="text-xs leading-relaxed">
+                                "Se você está pensando em usar um método (pílula, injetável, implante), venha conversar! O enfermeiro pode te dar o primeiro aconselhamento e te encaminhar para o serviço de saúde. Sua escolha é importante e precisa de acompanhamento profissional."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MÓDULO 5: ONDE BUSCAR AJUDA (Acesso Fácil) -->
+            <div class="module-card rounded-xl shadow-md bg-white border border-sky-100">
+                <button onclick="toggleModule('module-5')" class="w-full p-4 flex items-center justify-between text-left focus:outline-none">
+                    <div class="flex items-center space-x-3">
+                        <div class="module-icon-container rounded-full bg-sky-100 text-sky-600">
+                            <span class="text-xl">✅</span>
+                        </div>
+                        <p class="font-bold text-lg text-gray-800">MÓDULO 5: ONDE BUSCAR AJUDA (Acesso Fácil)</p>
+                    </div>
+                    <span class="text-2xl font-light text-gray-400 transform transition duration-300" id="icon-module-5">+</span>
+                </button>
+                <div id="module-5" class="content-hidden px-4 pb-4">
+                    <div class="pt-4 border-t border-gray-100 space-y-4 text-gray-700">
+                        <p class="text-sm font-semibold text-center text-sky-700">Não Está Sozinha! Onde Buscar Ajuda?</p>
+
+                        <!-- Item Enfermeiro -->
+                        <div class="bg-sky-50 p-4 rounded-lg border-l-4 border-sky-600 shadow-sm">
+                            <p class="font-bold text-sky-700 flex items-center mb-1">
+                                <span class="mr-2">👩‍⚕️</span> Seu Enfermeiro(a) Escolar
+                            </p>
+                            <p class="text-xs leading-relaxed">
+                                "Para perguntas sobre seu ciclo, cólicas, métodos contraceptivos, e aconselhamento sobre ISTs. Ele/ela é o seu <span class="font-bold">primeiro ponto de apoio</span> e pode te orientar."
+                            </p>
+                        </div>
+
+                        <!-- Item Posto de Saúde -->
+                        <div class="bg-sky-50 p-4 rounded-lg border-l-4 border-sky-600 shadow-sm">
+                            <p class="font-bold text-sky-700 flex items-center mb-1">
+                                <span class="mr-2">🏥</span> Posto de Saúde/UBS
+                            </p>
+                            <p class="text-xs leading-relaxed">
+                                "Local de acesso gratuito a camisinhas, testes rápidos, pílula do dia seguinte (se necessário) e para iniciar o uso de métodos contraceptivos com acompanhamento médico."
+                            </p>
+                        </div>
+
+                        <!-- Item Psicólogo -->
+                        <div class="bg-sky-50 p-4 rounded-lg border-l-4 border-sky-600 shadow-sm">
+                            <p class="font-bold text-sky-700 flex items-center mb-1">
+                                <span class="mr-2">🧠</span> Psicólogo(a)
+                            </p>
+                            <p class="text-xs leading-relaxed">
+                                "Para suporte emocional, lidar com estresse, ansiedade e em casos de TDPM (Transtorno Disfórico Pré-Menstrual) ou questões sobre sexualidade e relacionamentos."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- Fim dos Módulos -->
+
+    </div> <!-- FIM DA VISUALIZAÇÃO DO GUIA -->
+
+    <!-- VISUALIZAÇÃO DO CALENDÁRIO -->
+    <div id="calendar-view" class="view-content hidden pt-4">
+        <!-- ... Conteúdo do Calendário (Não alterado) ... -->
+
+        <div class="bg-white p-5 rounded-xl shadow-2xl mb-6">
+            <h2 class="text-2xl font-extrabold text-pink-600 mb-2">Calendário do Ciclo</h2>
+            <p class="text-sm text-gray-500 mb-4">Marque o primeiro dia e acompanhe seu fluxo.</p>
+
+            <!-- Controles de Navegação -->
+            <div class="flex justify-between items-center mb-4">
+                <button onclick="changeMonth(-1)" class="p-2 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+                <span id="current-month-display" class="text-xl font-bold text-gray-800">Novembro 2025</span>
+                <button onclick="changeMonth(1)" class="p-2 bg-pink-100 text-pink-600 rounded-full hover:bg-pink-200 transition">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </button>
+            </div>
+
+            <!-- Nomes dos Dias da Semana -->
+            <div class="calendar-grid text-center text-xs font-semibold text-gray-500 mb-2">
+                <div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div>
+            </div>
+
+            <!-- Container do Calendário -->
+            <div id="calendar-body" class="calendar-grid">
+                <!-- Dias do calendário serão inseridos aqui pelo JavaScript -->
+            </div>
+        </div>
+
+        <!-- RESUMO COLORIDO E GRÁFICO -->
+        <div id="cycle-summary" class="p-5 mt-4 bg-gradient-to-r from-pink-50 to-pink-100 rounded-xl shadow-md text-gray-700 transition transform hover:scale-[1.01]">
+            <h3 class="text-lg font-bold text-pink-700 mb-2 flex items-center">💖 Resumo do Ciclo</h3>
+            <p id="last-period" class="text-sm font-medium text-gray-700">Última menstruação: —</p>
+            <p id="next-period" class="text-sm mt-1 font-medium text-gray-700">Próxima prevista: —</p>
+
+            <div class="mt-5 bg-white p-3 rounded-xl shadow-inner">
+                <canvas id="cycleChart" height="120"></canvas>
+            </div>
+        </div>
+
+
+        <!-- Legenda do Calendário -->
+        <div class="p-4 bg-white rounded-xl shadow-md space-y-2 mt-4">
+            <p class="font-bold text-gray-700">Legenda:</p>
+            <div class="flex items-center space-x-4 text-sm text-gray-600">
+                <div class="flex items-center">
+                    <span class="flow-mark flow-menstruacao mr-2 w-4 h-4"></span>
+                    Primeiro Dia (Início do Ciclo)
+                </div>
+                <div class="flex items-center">
+                    <span class="flow-mark flow-medium mr-2 w-4 h-4"></span>
+                    Fluxo Médio/Forte
+                </div>
+                <div class="flex items-center">
+                    <span class="flow-mark flow-light mr-2 w-4 h-4"></span>
+                    Fluxo Leve
+                </div>
+                <div class="flex items-center text-xs text-gray-500">
+                    <div class="w-4 h-4 mr-2 rounded-full bg-pink-100/70 border border-pink-300"></div>
+                    Previsão Automática
+                </div>
+            </div>
+            <p class="text-xs text-red-500 mt-2">
+                🚨 ATENÇÃO: Use este calendário apenas para registro. <span class="font-semibold">Ele NÃO é um método contraceptivo.</span>
+            </p>
+            <p id="auth-status" class="text-xs text-center text-gray-400 mt-4">Autenticando...</p>
+        </div>
+
+    </div> <!-- FIM DA VISUALIZAÇÃO DO CALENDÁRIO -->
+
+    <!-- VISUALIZAÇÃO DA COMUNIDADE -->
+    <div id="community-view" class="view-content hidden pt-4">
+        <!-- ... Conteúdo da Comunidade (Não alterado) ... -->
+        <h2 class="text-2xl font-extrabold text-pink-600 mb-4">Comunidade Anônima</h2>
+        <div class="bg-pink-100 p-4 rounded-xl shadow-inner mb-6 border border-pink-200">
+            <p class="font-bold text-pink-700 mb-2 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                Regras e Segurança
+            </p>
+            <ul class="text-xs space-y-1 list-disc list-inside ml-2 text-gray-700">
+                <li><span class="font-semibold">Seja Gentil:</span> Respeito é inegociável.</li>
+                <li><span class="font-semibold">Mantenha o Sigilo:</span> Não compartilhe informações pessoais (nome, telefone).</li>
+                <li><span class="font-semibold text-red-600">Alerta:</span> As respostas não substituem a orientação de um profissional de saúde.</li>
+            </ul>
+        </div>
+        <div id="posts-list" class="space-y-4">
+            <p class="text-center text-gray-500 py-8" id="loading-posts">Carregando posts da comunidade...</p>
+        </div>
+        <button onclick="openNewPostModal()" class="fab w-14 h-14 rounded-full bg-pink-600 text-white flex items-center justify-center hover:bg-pink-700 transition">
+            <span class="text-3xl font-light">+</span>
+        </button>
+
+    </div> <!-- FIM DA VISUALIZAÇÃO DA COMUNIDADE -->
+
+    <!-- VISUALIZAÇÃO DO PERFIL (NOVO) -->
+    <div id="profile-view" class="view-content hidden pt-4">
+        <h2 class="text-2xl font-extrabold text-pink-600 mb-4">Meu Perfil e Configurações</h2>
+
+        <!-- Seção: Conta e Identificação -->
+        <div class="profile-section">
+            <h3 class="text-lg font-bold text-pink-700 mb-4">Minha Conta</h3>
+            <div class="mb-4">
+                <label for="profile-name" class="profile-label">Meu Apelido (opcional)</label>
+                <input type="text" id="profile-name" placeholder="Como podemos te chamar?" class="profile-input" onchange="saveProfile()">
+            </div>
+            <div>
+                <label class="profile-label">Meu ID de Usuário (para suporte)</label>
+                <p id="profile-user-id" class="text-xs text-gray-500 bg-gray-100 p-2 rounded-md font-mono break-all">Carregando...</p>
+            </div>
+        </div>
+
+        <!-- Seção: Configurações do Ciclo -->
+        <div class="profile-section">
+            <h3 class="text-lg font-bold text-pink-700 mb-4">Configurações do Ciclo</h3>
+            <p class="text-xs text-gray-500 mb-4">Essas informações ajudam a personalizar as previsões do seu calendário.</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label for="profile-cycle-length" class="profile-label">Duração do Ciclo (dias)</label>
+                    <input type="number" id="profile-cycle-length" value="28" class="profile-input" onchange="saveProfile()">
+                </div>
+                <div>
+                    <label for="profile-period-duration" class="profile-label">Duração da Menstruação (dias)</label>
+                    <input type="number" id="profile-period-duration" value="5" class="profile-input" onchange="saveProfile()">
+                </div>
+            </div>
+            <div>
+                <label for="profile-last-period" class="profile-label">Data da Última Menstruação</label>
+                <input type="date" id="profile-last-period" class_="profile-input" onchange="saveProfileLastPeriod()">
+                <p class="text-xs text-gray-400 mt-1">Isso recalibra o calendário. Você também pode marcar no calendário.</p>
+            </div>
+        </div>
+
+        <!-- Seção: Notificações (Ainda não funcional) -->
+        <div class="profile-section opacity-60">
+            <h3 class="text-lg font-bold text-gray-500 mb-4">Notificações (em breve)</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-600">Lembrete de Início da Menstruação</span>
+                    <button class="profile-toggle bg-gray-300" disabled><span class="profile-toggle-handle translate-x-1"></span></button>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="font-medium text-gray-600">Aviso de Período Fértil</span>
+                    <button class="profile-toggle bg-gray-300" disabled><span class="profile-toggle-handle translate-x-1"></span></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção: Privacidade e Suporte -->
+        <div class="profile-section">
+            <h3 class="text-lg font-bold text-pink-700 mb-4">Privacidade e Suporte</h3>
+            <div class="space-y-3">
+                <a href="#" class="block text-sm font-medium text-gray-700 hover:text-pink-600">Política de Privacidade</a>
+                <a href="#" class="block text-sm font-medium text-gray-700 hover:text-pink-600">Termos de Uso</a>
+                <a href="#" class="block text-sm font-medium text-gray-700 hover:text-pink-600">Versão do App (1.0.0)</a>
+            </div>
+        </div>
+
+        <!-- Seção: Ações da Conta -->
+        <div class="mt-6 space-y-3">
+            <button onclick="logout()" class="w-full py-2 px-4 border border-pink-600 rounded-lg text-sm font-semibold text-pink-600 hover:bg-pink-50 transition">
+                Sair da Conta (Logout)
+            </button>
+            <button onclick="openDeleteModal()" class="w-full py-2 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-500 hover:bg-red-50 hover:text-red-600 transition">
+                Solicitar Exclusão Permanente de Dados
+            </button>
+        </div>
+
+    </div> <!-- FIM DA VISUALIZAÇÃO DO PERFIL -->
+
+
+    <!-- Modal de Registro de Dia (Existente) -->
+    <div id="day-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden flex items-center justify-center p-4 z-50 transition-opacity" onclick="closeModal(event, 'day-modal')">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold text-pink-600 mb-4">Registrar Dia</h3>
+            <p class="text-sm text-gray-700 mb-4">O que aconteceu em <span id="modal-date-display" class="font-semibold text-gray-800"></span>?</p>
+
+            <div class="space-y-3">
+                <label class="block cursor-pointer p-2 rounded-lg hover:bg-pink-50 transition">
+                    <input type="radio" id="log-start" name="flow-type" value="start" class="mr-2 text-pink-600 focus:ring-pink-500">
+                    <span class="font-medium text-gray-700">🩸 Primeiro Dia da Menstruação (Início do Ciclo)</span>
+                </label>
+                <label class="block cursor-pointer p-2 rounded-lg hover:bg-pink-50 transition">
+                    <input type="radio" id="log-medium" name="flow-type" value="medium" class="mr-2 text-pink-600 focus:ring-pink-500">
+                    <span class="font-medium text-gray-700">🔴 Fluxo Médio/Forte</span>
+                </label>
+                <label class="block cursor-pointer p-2 rounded-lg hover:bg-pink-50 transition">
+                    <input type="radio" id="log-light" name="flow-type" value="light" class="mr-2 text-pink-600 focus:ring-pink-500">
+                    <span class="font-medium text-gray-700">🌸 Fluxo Leve (Final)</span>
+                </label>
+                <hr class="my-2 border-gray-100">
+                <label class="block cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition">
+                    <input type="radio" id="log-clear" name="flow-type" value="clear" class="mr-2 text-gray-500 focus:ring-gray-500">
+                    <span class="font-medium text-gray-500">❌ Limpar Registro</span>
+                </label>
+            </div>
+
+            <div class="flex justify-end space-x-3 mt-6">
+                <button onclick="hideModal('day-modal')" class="py-2 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+                    Cancelar
+                </button>
+                <button onclick="saveDayLog()" class="py-2 px-4 bg-pink-600 text-white rounded-lg text-sm font-semibold shadow-md hover:bg-pink-700 transition">
+                    Salvar Registro
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Nova Postagem (Existente) -->
+    <div id="post-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden flex items-center justify-center p-4 z-50 transition-opacity" onclick="closeModal(event, 'post-modal')">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold text-pink-600 mb-4">Pergunte de Forma Anônima</h3>
+
+            <form id="new-post-form" onsubmit="event.preventDefault(); savePost();">
+                <div class="mb-4">
+                    <label for="post-title" class="block text-sm font-medium text-gray-700 mb-1">Título da Pergunta (Curto)</label>
+                    <input type="text" id="post-title" required maxlength="100" placeholder="Ex: Cólica muito forte é normal?" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-pink-500 focus:ring-pink-500 p-2 text-sm">
+                </div>
+
+                <div class="mb-4">
+                    <label for="post-content" class="block text-sm font-medium text-gray-700 mb-1">Detalhes (Seja gentil e respeitosa)</label>
+                    <textarea id="post-content" required rows="4" placeholder="Detalhe sua dúvida ou experiência aqui..." class="w-full border-gray-300 rounded-lg shadow-sm focus:border-pink-500 focus:ring-pink-500 p-2 text-sm"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label for="post-topic" class="block text-sm font-medium text-gray-700 mb-1">Tópico</label>
+                    <select id="post-topic" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-pink-500 focus:ring-pink-500 p-2 text-sm">
+                        <option value="" disabled selected>Escolha um tópico</option>
+                        <option value="Meu Ciclo">Meu Ciclo 🩸</option>
+                        <option value="Contracepção">Contracepção 🛡️</option>
+                        <option value="ISTs e Prevenção">ISTs e Prevenção ❤️</option>
+                        <option value="Mente e Corpo">Mente e Corpo 🧘‍♀️</option>
+                        <option value="Relacionamentos">Relacionamentos 🤝</option>
+                    </select>
+                </div>
+
+                <div class="mb-6 flex items-center">
+                    <input type="checkbox" id="post-anonymous" checked class="h-4 w-4 text-pink-600 border-gray-300 rounded focus:ring-pink-500">
+                    <label for="post-anonymous" class="ml-2 text-sm font-semibold text-gray-700">Publicar como 'Anônima'</label>
+                </div>
+
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hideModal('post-modal')" class="py-2 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="py-2 px-4 bg-pink-600 text-white rounded-lg text-sm font-semibold shadow-md hover:bg-pink-700 transition">
+                        Publicar Pergunta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Exclusão (NOVO) -->
+    <div id="delete-confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden flex items-center justify-center p-4 z-[60] transition-opacity" onclick="closeModal(event, 'delete-confirm-modal')">
+        <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full" onclick="event.stopPropagation()">
+            <h3 class="text-xl font-bold text-red-600 mb-4">Você tem certeza?</h3>
+            <p class="text-sm text-gray-700 mb-4">
+                Esta ação é irreversível. Todos os seus dados de ciclo e perfil serão permanentemente excluídos.
+            </p>
+            <p class="text-sm text-gray-700 mb-6">
+                Suas postagens anônimas na comunidade <span class="font-semibold">não</span> serão excluídas.
+            </p>
+
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="hideModal('delete-confirm-modal')" class="py-2 px-4 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-100 transition">
+                    Cancelar
+                </button>
+                <button onclick="handleDeleteAccount()" class="py-2 px-4 bg-red-600 text-white rounded-lg text-sm font-semibold shadow-md hover:bg-red-700 transition">
+                    Sim, Excluir Meus Dados
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Barra de Navegação Inferior (Focada em Ícones) -->
+<nav class="navbar bg-white flex justify-around items-center h-16 border-t border-gray-200">
+    <button onclick="setView('guide-view')" id="nav-guide" class="flex flex-col items-center text-pink-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span class="text-xs font-semibold">Início</span>
+    </button>
+    <button onclick="setView('calendar-view')" id="nav-calendar" class="flex flex-col items-center text-gray-500 hover:text-pink-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h.01M7 12h.01M7 15h.01M17 12h.01M17 15h.01M12 12h.01M12 15h.01M21 20L3 20" />
+            <rect x="3" y="5" width="18" height="16" rx="2" ry="2" stroke="currentColor" fill="none"></rect>
+        </svg>
+        <span class="text-xs">Calendário</span>
+    </button>
+    <button onclick="setView('community-view')" id="nav-community" class="flex flex-col items-center text-gray-500 hover:text-pink-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-1a4 4 0 00-4-4H8a4 4 0 00-4 4v1h5m3-7a4 4 0 11-8 0 4 4 0 018 0zM12 12c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z" />
+        </svg>
+        <span class="text-xs">Comunidade</span>
+    </button>
+    <button onclick="setView('profile-view')" id="nav-profile" class="flex flex-col items-center text-gray-500 hover:text-pink-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        <span class="text-xs">Perfil</span>
+    </button>
+</nav>
+
+
+<script type="module">
+    // --- IMPORTAÇÕES FIREBASE ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, deleteDoc, collection, query, onSnapshot, orderBy, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Variáveis globais de módulos Firebase
+    let db, auth;
+    let userId;
+    let appId;
+
+    // Variáveis de estado
+    let currentView = 'guide-view';
+    let currentCalendarDate = new Date();
+    let loggedCycleData = {}; // { 'YYYY-MM-DD': {flow: 'start'|'medium'|'light'} }
+    let predictedCycleData = {};
+    let userProfile = {}; // NOVO: Armazena dados do perfil
+    let selectedDateForModal = '';
+    let communityPosts = [];
+
+    // Variável para a instância do Chart.js
+    let cycleChartInstance = null;
+
+    // Constantes de ciclo
+    const DEFAULT_CYCLE_LENGTH = 28;
+    const DEFAULT_PERIOD_DURATION = 5;
+
+    const monthNames = [
+        "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+        "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+    ];
+
+    // Mapeamento de Tópicos para Emojis
+    const topicEmojis = {
+        'Meu Ciclo': '🩸',
+        'Contracepção': '🛡️',
+        'ISTs e Prevenção': '❤️',
+        'Mente e Corpo': '🧘‍♀️',
+        'Relacionamentos': '🤝',
+    };
+
+    // Dados das fases (necessário para o Módulo 1)
+    const phaseData = {
+        menstruacao: { color: 'color-menstruacao', width: '25%', name: 'Menstruação (Dia 1-7)' },
+        folicular: { color: 'color-folicular', width: '35%', name: 'Folicular (Dia 8-13)' },
+        ovulacao: { color: 'color-ovulacao', width: '10%', name: 'Ovulação (Dia 14)' },
+        lutea: { color: 'color-lutea', width: '30%', name: 'Lútea (Dia 15-28)' }
+    };
+
+
+    // --- FUNÇÕES GERAIS DE UI ---
+
+    /**
+     * Alterna entre as visualizações (Guia, Calendário, Comunidade, Perfil).
+     */
+    window.setView = function(viewId) {
+        currentView = viewId;
+        document.querySelectorAll('.view-content').forEach(view => {
+            view.classList.add('hidden');
+        });
+        document.getElementById(viewId).classList.remove('hidden');
+
+        // Atualiza o subtítulo do cabeçalho
+        const subtitle = document.getElementById('header-subtitle');
+        if (viewId === 'calendar-view') {
+            subtitle.textContent = 'Acompanhe e registre seu fluxo menstrual.';
+            window.renderCalendar();
+            window.calculateCycleDataAndSummary();
+            window.renderCycleChart();
+        } else if (viewId === 'community-view') {
+            subtitle.textContent = 'Faça perguntas e receba apoio em um espaço seguro.';
+            if (communityPosts.length === 0) {
+                 document.getElementById('loading-posts').classList.remove('hidden');
+            } else {
+                 document.getElementById('loading-posts').classList.add('hidden');
+                 window.renderCommunityPosts();
+            }
+        } else if (viewId === 'profile-view') {
+            subtitle.textContent = 'Ajuste suas configurações e personalize sua experiência.';
+        } else {
+            subtitle.textContent = 'Um guia amigável para entender tudo sobre a sua primeira menstruação e seu corpo.';
+        }
+
+        // Atualiza o estado da navegação (cor do ícone)
+        ['nav-guide', 'nav-calendar', 'nav-community', 'nav-profile'].forEach(id => {
+            const navElement = document.getElementById(id);
+            if (navElement) {
+                navElement.classList.remove('text-pink-600', 'font-semibold');
+                navElement.classList.add('text-gray-500');
+                navElement.querySelector('span').classList.remove('font-semibold');
+            }
+        });
+
+        const activeNav = document.getElementById(`nav-${viewId.split('-')[0]}`);
+        if (activeNav) {
+            activeNav.classList.add('text-pink-600', 'font-semibold');
+            activeNav.classList.remove('text-gray-500');
+            activeNav.querySelector('span').classList.add('font-semibold');
+        }
+    }
+
+    // Função para fechar qualquer modal (genérica)
+    window.hideModal = function(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Função para fechar modal ao clicar fora
+    window.closeModal = function(event, modalId) {
+        if (event.target.id === modalId) {
+            window.hideModal(modalId);
+        }
+    }
+
+    // Função para alternar a visibilidade de um módulo (Acordeão)
+    window.toggleModule = function(moduleId) {
+        const content = document.getElementById(moduleId);
+        const icon = document.getElementById(`icon-${moduleId}`);
+
+        document.querySelectorAll('.content-visible').forEach(module => {
+            if (module.id !== moduleId) {
+                module.classList.remove('content-visible');
+                module.classList.add('content-hidden');
+                const otherIcon = document.getElementById(`icon-${module.id}`);
+                if (otherIcon) {
+                    otherIcon.textContent = '+';
+                    otherIcon.classList.remove('rotate-45');
+                }
+            }
+        });
+
+        const isVisible = content.classList.contains('content-visible');
+
+        if (isVisible) {
+            content.classList.remove('content-visible');
+            content.classList.add('content-hidden');
+            icon.textContent = '+';
+            icon.classList.remove('rotate-45');
+        } else {
+            content.classList.remove('content-hidden');
+            content.classList.add('content-visible');
+            icon.textContent = '–';
+            icon.classList.add('rotate-45');
+        }
+    }
+
+    window.updateCycleProgress = function(activePhaseId, activePhaseName) {
+         const currentDisplay = document.getElementById('current-phase-display');
+         if (!currentDisplay) return; // Proteção se o elemento não existir
+
+        const phaseBarContainer = document.querySelector('.phase-bar-active');
+
+        currentDisplay.textContent = activePhaseName;
+
+        if(phaseBarContainer) {
+            phaseBarContainer.classList.remove('phase-bar-active', 'shadow-2xl');
+            setTimeout(() => {
+                phaseBarContainer.classList.add('phase-bar-active', 'shadow-2xl');
+            }, 50);
+        }
+
+        Object.keys(phaseData).forEach(phaseId => {
+            const bar = document.getElementById(`bar-${phaseId}`);
+            if (!bar) return;
+
+            const phaseElements = bar.parentElement.parentElement.querySelectorAll('div, span');
+            const [phaseText, , phaseIcon] = phaseElements; // Assumindo a ordem
+
+            if (bar) {
+                const { color, width } = phaseData[phaseId];
+                if (phaseId === activePhaseId) {
+                    bar.style.width = width;
+                    if (phaseText) {
+                         phaseText.classList.add('text-pink-600');
+                         phaseText.classList.remove('text-gray-500');
+                    }
+                    if (phaseIcon) {
+                        phaseIcon.classList.add('text-pink-600');
+                        phaseIcon.classList.remove('text-gray-400');
+                    }
+                } else {
+                    bar.style.width = '0%';
+                    if (phaseText) {
+                         phaseText.classList.remove('text-pink-600');
+                         phaseText.classList.add('text-gray-500');
+                    }
+                    if (phaseIcon) {
+                        phaseIcon.classList.remove('text-pink-600');
+                        phaseIcon.classList.add('text-gray-400');
+                    }
+                }
+            }
+        });
+    }
+
+
+    // --- FUNÇÕES DO CALENDÁRIO E FIREBASE ---
+
+    function getCycleCollectionRef() {
+        if (!db || !userId) return null;
+        return collection(db, 'artifacts', appId, 'users', userId, 'cycle_data');
+    }
+
+    window.saveDayLog = async function() {
+        const flowType = document.querySelector('input[name="flow-type"]:checked')?.value;
+        const dateString = selectedDateForModal;
+
+        if (!dateString) {
+            console.error("Nenhuma data selecionada.");
+            return;
+        }
+
+        const colRef = getCycleCollectionRef();
+        if (!colRef) {
+             console.error("Firestore não inicializado ou usuário não autenticado.");
+             window.hideModal('day-modal');
+             return;
+        }
+
+        try {
+            const docRef = doc(colRef, dateString);
+
+            if (flowType === 'clear') {
+                await deleteDoc(docRef);
+                console.log("Registro de dia limpo:", dateString);
+            } else if (flowType) {
+                await setDoc(docRef, {
+                    flow: flowType,
+                    timestamp: new Date().getTime()
+                }, { merge: true });
+                console.log("Registro de dia salvo:", dateString, flowType);
+            }
+
+            window.hideModal('day-modal');
+        } catch (e) {
+            console.error("Erro ao salvar o registro do dia:", e);
+        }
+    }
+
+    window.openDayModal = function(dateString) {
+        console.log("Abrindo modal para a data:", dateString);
+        selectedDateForModal = dateString;
+        const dateParts = dateString.split('-');
+        const date = new Date(parseInt(dateParts[0]), parseInt(dateParts[1]) - 1, parseInt(dateParts[2]));
+
+        document.getElementById('modal-date-display').textContent = date.toLocaleDateString('pt-BR', {
+            weekday: 'short', year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        const currentLog = loggedCycleData[dateString]?.flow || predictedCycleData[dateString]?.flow;
+
+        document.querySelectorAll('input[name="flow-type"]').forEach(radio => {
+            radio.checked = (radio.value === currentLog);
+        });
+
+        if (!currentLog) {
+            document.querySelectorAll('input[name="flow-type"]').forEach(radio => radio.checked = false);
+        }
+
+        document.getElementById('day-modal').classList.remove('hidden');
+    }
+
+    window.calculateCycleDataAndSummary = function() {
+        // USA DADOS DO PERFIL (NOVO)
+        const cycleLength = userProfile.cycleLength ? parseInt(userProfile.cycleLength) : DEFAULT_CYCLE_LENGTH;
+        const periodDuration = userProfile.periodDuration ? parseInt(userProfile.periodDuration) : DEFAULT_PERIOD_DURATION;
+
+        const dates = Object.keys(loggedCycleData)
+            .filter(d => loggedCycleData[d].flow === "start")
+            .sort((a, b) => new Date(b) - new Date(a));
+
+        let lastStartDate = null;
+        let nextPredictedStart = null;
+        predictedCycleData = {};
+
+        if (dates.length > 0) {
+            lastStartDate = new Date(`${dates[0]}T12:00:00`); // Define hora para evitar problemas de fuso
+            nextPredictedStart = new Date(lastStartDate);
+            nextPredictedStart.setDate(nextPredictedStart.getDate() + cycleLength);
+
+            let currentDate = new Date(lastStartDate);
+
+            for (let i = 0; i <= periodDuration; i++) {
+                if (i > 0) {
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                const dateString = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')}`;
+
+                let flowType;
+                if (i === 0) {
+                    flowType = 'start';
+                } else if (i < periodDuration) {
+                    flowType = 'medium';
+                } else {
+                    flowType = 'light';
+                }
+
+                if (!loggedCycleData[dateString] || loggedCycleData[dateString].flow === 'start') {
+                     if (i > 0 || !loggedCycleData[dateString]) {
+                         predictedCycleData[dateString] = { flow: flowType, isPredicted: true };
+                     }
+                }
+            }
+
+            const dateFormatter = new Intl.DateTimeFormat('pt-BR', { year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById("last-period").textContent = `Última menstruação: ${dateFormatter.format(lastStartDate)}`;
+            document.getElementById("next-period").textContent = `Próxima prevista (${cycleLength} dias): ${dateFormatter.format(nextPredictedStart)}`;
+
+            // Atualiza o input no perfil (se existir)
+            const profileLastPeriodInput = document.getElementById("profile-last-period");
+            if (profileLastPeriodInput) {
+                profileLastPeriodInput.value = dates[0];
+            }
+
+        } else {
+            document.getElementById("last-period").textContent = "Última menstruação: —";
+            document.getElementById("next-period").textContent = "Próxima prevista: —";
+        }
+    }
+
+    window.renderCalendar = function() {
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+
+        const firstDayOfMonth = new Date(year, month, 1);
+        const lastDayOfMonth = new Date(year, month + 1, 0);
+        const numDays = lastDayOfMonth.getDate();
+        const firstWeekday = firstDayOfMonth.getDay();
+
+        document.getElementById('current-month-display').textContent =
+            `${monthNames[month]} ${year}`;
+
+        const calendarBody = document.getElementById('calendar-body');
+        calendarBody.innerHTML = '';
+
+        const today = new Date();
+        const todayString = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+        for (let i = 0; i < firstWeekday; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.className = 'calendar-day bg-gray-50/50';
+            calendarBody.appendChild(emptyDay);
+        }
+
+        for (let day = 1; day <= numDays; day++) {
+            const dateString = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+            const explicitLog = loggedCycleData[dateString];
+            const predictedLog = predictedCycleData[dateString];
+            const log = explicitLog ? explicitLog : predictedLog;
+
+            const dayElement = document.createElement('div');
+
+            dayElement.className = 'calendar-day bg-white shadow-sm transition border border-gray-100';
+            dayElement.classList.add('hover:bg-pink-50', 'cursor-pointer');
+            dayElement.onclick = () => window.openDayModal(dateString);
+
+            if (dateString === todayString) {
+                dayElement.classList.add('is-today', 'border-pink-600');
+            }
+
+            dayElement.innerHTML = `<span class="day-number text-gray-800">${day}</span>`;
+
+            if (log && log.flow !== 'clear') {
+                const mark = document.createElement('div');
+
+                let flowClass = '';
+                if (log.flow === 'start') {
+                    mark.title = 'Primeiro Dia (Início)';
+                    flowClass = 'flow-menstruacao w-3 h-3';
+                } else if (log.flow === 'medium') {
+                    mark.title = 'Fluxo Médio/Forte';
+                    flowClass = 'flow-medium';
+                } else if (log.flow === 'light') {
+                    mark.title = 'Fluxo Leve';
+                    flowClass = 'flow-light';
+                }
+
+                if (flowClass) {
+                    mark.className = `flow-mark ${flowClass}`;
+                    dayElement.appendChild(mark);
+
+                    if (log.isPredicted && !explicitLog) {
+                         dayElement.classList.add('bg-pink-100/70', 'border-pink-300', 'opacity-80');
+                         mark.title = `Previsto: ${mark.title}`;
+                    } else {
+                         dayElement.classList.add('bg-pink-50', 'border-pink-200');
+                    }
+                }
+            }
+
+            calendarBody.appendChild(dayElement);
+        }
+    }
+
+    window.changeMonth = function(offset) {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+        window.renderCalendar();
+    }
+
+    function subscribeToCycleData() {
+        const colRef = getCycleCollectionRef();
+        if (!colRef) return;
+
+        const q = query(colRef);
+
+        onSnapshot(q, (snapshot) => {
+            loggedCycleData = {};
+            snapshot.forEach((doc) => {
+                loggedCycleData[doc.id] = doc.data();
+            });
+            console.log("Dados do ciclo atualizados. Total de dias registrados:", Object.keys(loggedCycleData).length);
+
+            window.calculateCycleDataAndSummary();
+            window.renderCalendar();
+            window.renderCycleChart();
+
+        }, (error) => {
+            console.error("Erro ao receber dados do Firestore:", error);
+        });
+    }
+
+    // --- FUNÇÕES DA COMUNIDADE ---
+
+    function getCommunityCollectionRef() {
+        if (!db) return null;
+        return collection(db, 'artifacts', appId, 'public', 'data', 'community_posts');
+    }
+
+    window.openNewPostModal = function() {
+        document.getElementById('new-post-form').reset();
+        document.getElementById('post-anonymous').checked = true;
+        document.getElementById('post-modal').classList.remove('hidden');
+    }
+
+    window.savePost = async function() {
+        const title = document.getElementById('post-title').value.trim();
+        const content = document.getElementById('post-content').value.trim();
+        const topic = document.getElementById('post-topic').value;
+        const isAnonymous = document.getElementById('post-anonymous').checked;
+
+        if (!title || !content || !topic) {
+            console.error("Todos os campos devem ser preenchidos.");
+            return;
+        }
+
+        const colRef = getCommunityCollectionRef();
+        if (!colRef) {
+             console.error("Firestore não inicializado.");
+             window.hideModal('post-modal');
+             return;
+        }
+
+        const postData = {
+            title: title,
+            content: content,
+            topic: topic,
+            authorId: userId,
+            authorName: isAnonymous ? 'Anônima' : (userProfile.name || userId.substring(0, 8)), // USA NOME DO PERFIL
+            isAnonymous: isAnonymous,
+            timestamp: new Date().getTime()
+        };
+
+        try {
+            await setDoc(doc(colRef, crypto.randomUUID()), postData);
+            console.log("Postagem da comunidade salva com sucesso.");
+            window.hideModal('post-modal');
+        } catch (e) {
+            console.error("Erro ao salvar a postagem da comunidade:", e);
+        }
+    }
+
+    function subscribeToCommunityPosts() {
+        const colRef = getCommunityCollectionRef();
+        if (!colRef) return;
+
+        const q = query(colRef, orderBy('timestamp', 'desc'));
+
+        onSnapshot(q, (snapshot) => {
+            communityPosts = [];
+            snapshot.forEach((doc) => {
+                communityPosts.push({ id: doc.id, ...doc.data() });
+            });
+            console.log(`Posts da comunidade atualizados. Total: ${communityPosts.length}`);
+
+            document.getElementById('loading-posts').classList.add('hidden');
+
+            if (currentView === 'community-view') {
+                window.renderCommunityPosts();
+            }
+
+        }, (error) => {
+            console.error("Erro ao receber posts da comunidade:", error);
+            document.getElementById('loading-posts').textContent = "Erro ao carregar posts.";
+        });
+    }
+
+    window.renderCommunityPosts = function() {
+        const listContainer = document.getElementById('posts-list');
+        listContainer.innerHTML = '';
+
+        if (communityPosts.length === 0) {
+            listContainer.innerHTML = '<p class="text-center text-gray-500 py-8">Nenhuma pergunta ainda. Seja a primeira a perguntar!</p>';
+            return;
+        }
+
+        communityPosts.forEach(post => {
+            const authorDisplay = post.isAnonymous ? 'Anônima' : post.authorName;
+            const topicEmoji = topicEmojis[post.topic] || '💬';
+            const timeAgo = formatTimeAgo(post.timestamp);
+
+            const card = document.createElement('div');
+            card.className = 'bg-white p-4 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition cursor-pointer';
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-semibold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full">${topicEmoji} ${post.topic}</span>
+                    <span class="text-xs text-gray-400">${timeAgo}</span>
+                </div>
+                <h4 class="text-lg font-bold text-gray-800 mb-2">${post.title}</h4>
+                <p class="text-sm text-gray-600 line-clamp-2 mb-3">${post.content}</p>
+                <div class="flex items-center text-xs text-gray-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 ${post.isAnonymous ? 'text-gray-400' : 'text-pink-500'}" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                    Postado por: <span class="font-semibold ml-1">${authorDisplay}</span>
+                    <span class="ml-auto text-pink-600 font-medium">0 Respostas</span>
+                </div>
+            `;
+            listContainer.appendChild(card);
+        });
+    }
+
+    function formatTimeAgo(timestamp) {
+        const now = new Date();
+        const postDate = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - postDate) / 1000);
+
+        if (diffInSeconds < 60) return "agora mesmo";
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min atrás`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} h atrás`;
+
+        const options = { month: 'short', day: 'numeric' };
+        return postDate.toLocaleDateString('pt-BR', options);
+    }
+
+    // --- FUNÇÕES DO PERFIL (NOVAS) ---
+
+    /**
+     * Retorna a referência do documento de perfil do usuário.
+     */
+    function getProfileDocRef() {
+        if (!db || !userId) return null;
+        // Salva as configurações em um único documento: .../users/{userId}/settings/profile
+        return doc(db, 'artifacts', appId, 'users', userId, 'settings', 'profile');
+    }
+
+    /**
+     * Salva as configurações do perfil no Firestore.
+     */
+    window.saveProfile = async function() {
+        const docRef = getProfileDocRef();
+        if (!docRef) return;
+
+        const profileData = {
+            name: document.getElementById('profile-name').value,
+            cycleLength: parseInt(document.getElementById('profile-cycle-length').value) || DEFAULT_CYCLE_LENGTH,
+            periodDuration: parseInt(document.getElementById('profile-period-duration').value) || DEFAULT_PERIOD_DURATION,
+        };
+
+        try {
+            await setDoc(docRef, profileData, { merge: true });
+            console.log("Perfil salvo:", profileData);
+        } catch (e) {
+            console.error("Erro ao salvar perfil:", e);
+        }
+    }
+
+    /**
+     * Salva a data da última menstruação (ação especial).
+     */
+    window.saveProfileLastPeriod = async function() {
+        // 1. Salva a configuração no perfil
+        await window.saveProfile();
+
+        // 2. Adiciona/Sobrescreve o registro no calendário
+        const dateString = document.getElementById('profile-last-period').value;
+        if (!dateString) return;
+
+        const colRef = getCycleCollectionRef();
+        if (!colRef) return;
+
+        try {
+            const docRef = doc(colRef, dateString);
+            await setDoc(docRef, {
+                flow: 'start',
+                timestamp: new Date(dateString).getTime()
+            }, { merge: true });
+            console.log("Data da última menstruação (do Perfil) salva:", dateString);
+        } catch (e) {
+            console.error("Erro ao salvar data do perfil no calendário:", e);
+        }
+    }
+
+    /**
+     * Renderiza os dados do perfil nos campos do formulário.
+     */
+    function renderProfile() {
+        document.getElementById('profile-name').value = userProfile.name || '';
+        document.getElementById('profile-cycle-length').value = userProfile.cycleLength || DEFAULT_CYCLE_LENGTH;
+        document.getElementById('profile-period-duration').value = userProfile.periodDuration || DEFAULT_PERIOD_DURATION;
+        document.getElementById('profile-user-id').textContent = userId || 'N/A';
+
+        // O input de data da última menstruação é preenchido pelo 'calculateCycleDataAndSummary'
+    }
+
+    /**
+     * Assina as mudanças do documento de perfil no Firestore.
+     */
+    function subscribeToProfile() {
+        const docRef = getProfileDocRef();
+        if (!docRef) return;
+
+        onSnapshot(docRef, (doc) => {
+            if (doc.exists()) {
+                userProfile = doc.data();
+                console.log("Perfil carregado:", userProfile);
+            } else {
+                console.log("Nenhum perfil encontrado, usando padrões.");
+                userProfile = {};
+            }
+            // Re-renderiza o perfil E recalcula o ciclo com os novos dados
+            renderProfile();
+            window.calculateCycleDataAndSummary();
+            window.renderCycleChart();
+        }, (error) => {
+            console.error("Erro ao carregar perfil:", error);
+        });
+    }
+
+    /**
+     * Desloga o usuário.
+     */
+    window.logout = function() {
+        if (!auth) return;
+        signOut(auth).catch((error) => {
+            console.error("Erro ao sair:", error);
+        });
+    }
+
+    /**
+     * Abre o modal de confirmação de exclusão.
+     */
+    window.openDeleteModal = function() {
+        document.getElementById('delete-confirm-modal').classList.remove('hidden');
+    }
+
+    /**
+     * Lida com a exclusão da conta (ação simulada).
+     */
+    window.handleDeleteAccount = function() {
+        console.warn("Ação de exclusão de conta iniciada. (Simulado: Apenas Logout)");
+        // Em um app real, aqui você chamaria uma Cloud Function para excluir
+        // recursivamente os dados do usuário (cycle_data, settings).
+        // Por segurança, o cliente não pode excluir coleções.
+
+        // Por enquanto, apenas deslogamos o usuário.
+        window.hideModal('delete-confirm-modal');
+        window.logout();
+    }
+
+
+    // --- INICIALIZAÇÃO E AUTENTICAÇÃO FIREBASE (MANTIDAS) ---
+
+    async function initializeAppAndAuth() {
+        appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const authStatus = document.getElementById('auth-status');
+
+        if (!firebaseConfig.apiKey) {
+            authStatus.textContent = "Modo Local (Dados não persistentes).";
+            setupApp();
+            return;
+        }
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+
+            const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    userId = user.uid;
+                    authStatus.textContent = `Usuário conectado: ${userId.substring(0, 8)}...`;
+
+                    // Assina todos os dados necessários
+                    subscribeToProfile(); // NOVO
+                    subscribeToCycleData();
+                    subscribeToCommunityPosts();
+
+                } else {
+                    // Limpa dados locais ao deslogar
+                    userId = null;
+                    userProfile = {};
+                    loggedCycleData = {};
+                    communityPosts = [];
+                    authStatus.textContent = 'Desconectado. Tentando login anônimo...';
+
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Autenticação falhou:", error);
+                        userId = 'unauthenticated-' + crypto.randomUUID();
+                        authStatus.textContent = 'Falha na autenticação. Recarregue.';
+                    }
+                }
+                setupApp();
+            });
+
+        } catch (e) {
+            console.error("Falha ao inicializar Firebase:", e);
+            authStatus.textContent = "Erro ao carregar serviços. Modo Local.";
+            setupApp();
+        }
+    }
+
+    function setupApp() {
+        // Define a visão padrão e renderiza componentes
+        window.setView('guide-view');
+        window.updateCycleProgress('menstruacao', phaseData.menstruacao.name);
+
+        // Listeners dos sub-cards do Módulo 1
+        document.querySelectorAll('.phase-selector').forEach(card => {
+            card.addEventListener('click', () => {
+                const phaseId = card.getAttribute('data-phase-id');
+                const phaseName = card.getAttribute('data-phase-name');
+                window.updateCycleProgress(phaseId, phaseName);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // Renderiza tudo com os dados atuais (que podem estar vazios ou vindo do Firestore)
+        renderProfile();
+        window.calculateCycleDataAndSummary();
+        window.renderCycleChart();
+    }
+
+    // Inicializa o Chart.js (necessário para o setupApp)
+    window.renderCycleChart = function() {
+        const ctx = document.getElementById('cycleChart')?.getContext('2d');
+        if (!ctx) return;
+
+        if (cycleChartInstance) {
+            cycleChartInstance.destroy();
+        }
+
+        // Atualiza o gráfico para usar os dados do perfil
+        const cycleLength = userProfile.cycleLength ? parseInt(userProfile.cycleLength) : DEFAULT_CYCLE_LENGTH;
+        const periodDuration = userProfile.periodDuration ? parseInt(userProfile.periodDuration) : DEFAULT_PERIOD_DURATION;
+        const follicularDuration = Math.max(5, (cycleLength / 2) - periodDuration - 1);
+        const lutealDuration = Math.max(10, cycleLength - periodDuration - follicularDuration - 1);
+
+        cycleChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Menstruação', 'Folicular', 'Ovulação', 'Lútea'],
+                datasets: [{
+                    label: 'Duração (dias)',
+                    data: [periodDuration, follicularDuration, 1, lutealDuration], // Dados dinâmicos
+                    backgroundColor: ['#E91E63', '#2196F3', '#4CAF50', '#FF9800'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: 'Suas Fases do Ciclo (Estimado)', // Título dinâmico
+                        font: { size: 14, weight: 'bold' },
+                        color: '#4B5563'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: Math.max(15, lutealDuration + 2), // Eixo Y dinâmico
+                        grid: { display: false },
+                        ticks: { stepSize: 5 }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
+                animation: { duration: 1200, easing: 'easeOutBounce' }
+            }
+        });
+    }
+
+    // Inicia a aplicação
+    initializeAppAndAuth();
+</script>
+</body>
+</html>
+

@@ -2591,18 +2591,15 @@ async function perguntarIA(pergunta) {
   container.prepend(card); // adiciona no topo (mantém os anteriores abaixo)
 
   try {
-    const response = await fetch("https://api.binjie.fun/api/generateStream", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        prompt: `Responda **em português do Brasil**, de forma gentil, educativa e clara sobre o ciclo menstrual feminino. Pergunta da usuária: ${pergunta}`,
-        temperature: 0.7
-      })
-    });
+    const response = await fetch("/api/gemini", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ pergunta }),
+});
 
-    const data = await response.text();
-    const resposta = data ? data.trim() : "Não consegui responder agora 😔";
+const data = await response.json();
+const resposta = data.resposta || "Não consegui responder agora 😔";
+
 
     // Atualiza o card com a resposta e botão de nova pergunta
     card.innerHTML = `

@@ -2596,8 +2596,24 @@ async function perguntarIA(pergunta, referenciaContainer) {
       })
     });
 
-    const data = await response.text();
-    const resposta = data ? data.trim() : "Não consegui responder agora 😔";
+    let data = await response.text();
+let resposta = data ? data.trim() : "Não consegui responder agora 😔";
+
+// Detecta se o texto tem caracteres não latinos (ex: japonês, chinês)
+const contemJapones = /[\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff]/.test(resposta);
+
+if (contemJapones) {
+  try {
+    // Usa uma API gratuita de tradução (MyMemory)
+    const traducaoResp = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(resposta)}&langpair=ja|pt-BR`);
+    const traducaoData = await traducaoResp.json();
+    resposta = traducaoData.responseData.translatedText || "Tradução indisponível 😅";
+  } catch (e) {
+    console.error("Erro na tradução:", e);
+    resposta = "A IA respondeu em outro idioma e não consegui traduzir agora 😔";
+  }
+}
+
 
     // Atualiza o card com a resposta e adiciona o botão "Fazer outra pergunta"
     card.innerHTML = `

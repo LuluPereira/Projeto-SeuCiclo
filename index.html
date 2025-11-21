@@ -643,11 +643,7 @@
         </div> <!-- Fim dos Módulos -->
 
 
-
-
     </div> <!-- FIM DA VISUALIZAÇÃO DO GUIA -->
-
-
 
 
     <!-- VISUALIZAÇÃO DO CALENDÁRIO -->
@@ -680,6 +676,9 @@
                 <!-- Dias do calendário serão inseridos aqui pelo JavaScript -->
             </div>
         </div>
+
+
+
 
         <!-- RESUMO COLORIDO E GRÁFICO -->
         <div id="cycle-summary" class="p-5 mt-4 bg-gradient-to-r from-pink-50 to-pink-100 rounded-xl shadow-md text-gray-700 transition transform hover:scale-[1.01]">
@@ -720,13 +719,18 @@
             <p id="auth-status" class="text-xs text-center text-gray-400 mt-4">Autenticando...</p>
         </div>
 
+
+
+
     </div> <!-- FIM DA VISUALIZAÇÃO DO CALENDÁRIO -->
 
 
 
 
+
+
     <div id="community-view" class="view-content hidden">
-        <!-- DIÁRIO DIGITAL -->
+        <!-- COMUNINDADE -->
         <div class="bg-white p-6 rounded-xl shadow-lg mb-10">
             <h2 class="text-2xl font-bold text-pink-600 mb-6 text-center">Como você está hoje?</h2>
             <form id="diario-form" class="space-y-8">
@@ -774,36 +778,30 @@
             </div>
         </div>
     </div>
+</div>
+
+
+<!-- FIM DA VISUALIZAÇÃO DA COMUNIDADE -->
 
 
 
-
-
-
-
-</div> <!-- FIM DA VISUALIZAÇÃO DA COMUNIDADE -->
-
-<!-- VISUALIZAÇÃO DO PERFIL (NOVO) -->
-<div id="profile-view" class="view-content hidden pt-4">
-    <h2 class="text-2xl font-extrabold text-pink-600 mb-4">Meu Perfil e Configurações</h2>
-
-    <!-- Seção: Conta e Identificação -->
-    <div class="profile-section">
-        <h3 class="text-lg font-bold text-pink-700 mb-4">Minha Conta</h3>
-        <div class="mb-4">
-            <label for="profile-name" class="profile-label">Meu Apelido (opcional)</label>
-            <input type="text" id="profile-name" placeholder="Como podemos te chamar?" class="profile-input" onchange="saveProfile()">
-        </div>
-        <div>
-            <label class="profile-label">Meu ID de Usuário (para suporte)</label>
-            <p id="profile-user-id" class="text-xs text-gray-500 bg-gray-100 p-2 rounded-md font-mono break-all">Carregando...</p>
-        </div>
-    </div>
+<!-- VISUALIZAÇÃO DO PERFIL -->
+<div id="profile-view" class="view-content hidden">
 
     <!-- Seção: Configurações do Ciclo -->
     <div class="profile-section">
         <h3 class="text-lg font-bold text-pink-700 mb-4">Configurações do Ciclo</h3>
         <p class="text-xs text-gray-500 mb-4">Essas informações ajudam a personalizar as previsões do seu calendário.</p>
+
+        <label for="profile-name" class="profile-label">Como podemos te chamar?</label>
+        <input
+                id="profile-name"
+                type="text"
+                class="profile-input"
+                placeholder="Digite seu nome ou apelido"
+                onchange="saveProfile()"
+        />
+
 
         <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
@@ -817,30 +815,39 @@
         </div>
         <div>
             <label for="profile-last-period" class="profile-label">Data da Última Menstruação</label>
-            <input type="date" id="profile-last-period" class_="profile-input" onchange="saveProfileLastPeriod()">
+            <input type="date" id="profile-last-period" class="profile-input" onchange="saveProfileLastPeriod()">
+
             <p class="text-xs text-gray-400 mt-1">Isso recalibra o calendário. Você também pode marcar no calendário.</p>
         </div>
     </div>
 
 
-    <!-- Seção: Notificações -->
+    <!-- Seção: CheckList -->
     <div class="profile-section">
-        <h3 class="text-lg font-bold text-pink-700 mb-4">Notificações</h3>
-        <div class="space-y-3">
-            <div class="flex justify-between items-center">
-                <span class="font-medium text-gray-700">Lembrete de Início da Menstruação</span>
-                <button id="toggle-reminder-start" class="profile-toggle bg-gray-300" onclick="toggleNotification('reminderStart')">
-                    <span class="profile-toggle-handle translate-x-1"></span>
-                </button>
-            </div>
-            <div class="flex justify-between items-center">
-                <span class="font-medium text-gray-700">Aviso de Período Fértil</span>
-                <button id="toggle-reminder-fertile" class="profile-toggle bg-gray-300" onclick="toggleNotification('reminderFertile')">
-                    <span class="profile-toggle-handle translate-x-1"></span>
-                </button>
-            </div>
-        </div>
+        <h2 class="text-lg font-bold text-pink-600 mb-4">Checklist de Autocuidado</h2>
+        <p class="text-sm text-gray-600 mb-3">
+            Durante o ciclo menstrual, cuidar de si mesma ajuda a reduzir desconfortos e manter o bem-estar físico e emocional.
+        </p>
+        <ul class="text-sm text-gray-700 space-y-2">
+            <li><label><input type="checkbox" id="check-agua" class="mr-2"> Beber bastante água</label></li>
+            <li><label><input type="checkbox" id="check-frutas" class="mr-2"> Comer frutas e verduras</label></li>
+            <li><label><input type="checkbox" id="check-alongamento" class="mr-2"> Fazer alongamentos leves</label></li>
+            <li><label><input type="checkbox" id="check-sono" class="mr-2"> Dormir bem</label></li>
+            <li><label><input type="checkbox" id="check-relaxar" class="mr-2"> Reservar um tempo para relaxar</label></li>
+            <li><label><input type="checkbox" id="check-sal" class="mr-2"> Evitar excesso de sal e açúcar</label></li>
+            <li><label><input type="checkbox" id="check-anotar" class="mr-2"> Anotar sintomas ou emoções</label></li>
+            <li><label><input type="checkbox" id="check-conversa" class="mr-2"> Conversar com alguém de confiança</label></li>
+        </ul>
+
+        <!-- Frase de finalização -->
+        <p class="text-sm italic text-pink-700 mt-4 text-center">
+            Seu ciclo é parte da sua história. Cuidar de você é celebrar quem você é!
+        </p>
     </div>
+
+
+
+
 
 
 
@@ -864,8 +871,10 @@
             Solicitar Exclusão Permanente de Dados
         </button>
     </div>
+</div> <!-- FECHA O PROFILE-VIEW CORRETAMENTE -->
 
-</div> <!-- FIM DA VISUALIZAÇÃO DO PERFIL -->
+
+<!-- FIM DA VISUALIZAÇÃO DO PERFIL -->
 
 
 <!-- Modal de Registro de Dia (Existente) -->
@@ -973,7 +982,7 @@
 </div>
 
 
-</div>
+
 
 <!-- Barra de Navegação Inferior (Focada em Ícones) -->
 <nav class="navbar bg-white flex justify-around items-center h-16 border-t border-gray-200">
@@ -1003,6 +1012,11 @@
         <span class="text-xs">Perfil</span>
     </button>
 </nav>
+
+
+
+<!-- VISUALIZAÇÃO DO PERFIL (NOVO) -->
+
 
 
 <script type="module">
@@ -1582,11 +1596,23 @@
         }
     }
 
-    /**
-     * Salva a data da última menstruação (ação especial).
-     */
-    window.saveProfileLastPeriod = async function() {
-    window.toggleNotification = async function(type) {
+
+
+
+   /**
+ * Salva a data da última menstruação (ação especial).
+ */
+window.saveProfileLastPeriod = async function() {
+  const input = document.getElementById("profile-last-period");
+  if (input) {
+    localStorage.setItem("profile-last-period", input.value);
+  }
+};
+
+/**
+ * Alterna notificações (lembrete de início ou fértil).
+ */
+window.toggleNotification = async function(type) {
   if (!userProfile) return;
   userProfile[type] = !userProfile[type];
 
@@ -1606,7 +1632,9 @@
 };
 
 
-};
+
+
+
 
 
 
@@ -1875,67 +1903,7 @@ if (toggleFertile) {
 
 </script>
 
-<script>
-    // Recupera dados salvos ou inicia vazio
-    let cycleData = JSON.parse(localStorage.getItem("cycleData")) || {};
 
-    // Função para salvar o dia marcado
-    function saveDay(date, flowType) {
-      cycleData[date] = flowType;
-      localStorage.setItem("cycleData", JSON.stringify(cycleData));
-      renderCalendar();
-    }
-
-    // Função chamada ao clicar em "Salvar" no modal
-    function saveDayFromModal() {
-      const date = document.getElementById("modal-date-display").innerText;
-      let selected = null;
-
-      if (document.getElementById("log-start").checked) selected = "start";
-      if (document.getElementById("log-medium").checked) selected = "medium";
-      if (document.getElementById("log-light").checked) selected = "light";
-
-      if (selected) {
-        saveDay(date, selected);
-        document.getElementById("day-modal").classList.add("hidden");
-      }
-    }
-
-    // Renderiza o calendário com as marcações
-    function renderCalendar() {
-      const calendarBody = document.getElementById("calendar-body");
-      calendarBody.innerHTML = "";
-
-      // Exemplo simples: 30 dias
-      for (let d = 1; d <= 30; d++) {
-        const dayDate = `2025-11-${String(d).padStart(2,'0')}`;
-        const dayCell = document.createElement("div");
-        dayCell.className = "calendar-day";
-        dayCell.innerHTML = `<span class="day-number">${d}</span>`;
-
-        // Se já tem registro, adiciona marca
-        if (cycleData[dayDate]) {
-          const mark = document.createElement("span");
-          mark.classList.add("flow-mark");
-          if (cycleData[dayDate] === "start") mark.classList.add("flow-menstruacao");
-          if (cycleData[dayDate] === "medium") mark.classList.add("flow-medium");
-          if (cycleData[dayDate] === "light") mark.classList.add("flow-light");
-          dayCell.appendChild(mark);
-        }
-
-        // Ao clicar, abre modal
-        dayCell.onclick = () => {
-          document.getElementById("modal-date-display").innerText = dayDate;
-          document.getElementById("day-modal").classList.remove("hidden");
-        };
-
-        calendarBody.appendChild(dayCell);
-      }
-    }
-
-    // Inicializa ao carregar
-    document.addEventListener("DOMContentLoaded", renderCalendar);
-</script>
 
 <script type="module">
     // --- IMPORTS FIREBASE (mantidos) ---
@@ -2193,7 +2161,7 @@ if (toggleFertile) {
         const dayElement = document.createElement('div');
         dayElement.className = 'calendar-day bg-white shadow-sm transition border border-gray-100 hover:bg-pink-50 cursor-pointer';
         dayElement.onclick = () => window.openDayModal(dateString);
-        if (dateString === todayString) dayElement.classList.add('is-today','border-pink-600');
+         if (dateString === todayString) dayElement.classList.add('is-today','border-pink-600');
         dayElement.innerHTML = `<span class="day-number text-gray-800">${day}</span>`;
 
         if (log && log.flow && log.flow !== 'clear') {
@@ -2324,30 +2292,104 @@ if (toggleFertile) {
       }
       window.calculateCycleDataAndSummary(); window.renderCalendar(); window.renderCycleChart();
     };
-    function renderProfile() {
-      const nameEl = document.getElementById('profile-name'); if (nameEl) nameEl.value = userProfile.name || "";
-      const clEl = document.getElementById('profile-cycle-length'); if (clEl) clEl.value = userProfile.cycleLength || DEFAULT_CYCLE_LENGTH;
-      const pdEl = document.getElementById('profile-period-duration'); if (pdEl) pdEl.value = userProfile.periodDuration || DEFAULT_PERIOD_DURATION;
-      const uidEl = document.getElementById('profile-user-id'); if (uidEl) uidEl.textContent = userId || 'N/A';
 
-      const toggleStart = document.getElementById('toggle-reminder-start');
-const toggleFertile = document.getElementById('toggle-reminder-fertile');
 
-if (toggleStart) {
-  toggleStart.classList.toggle('bg-pink-500', userProfile.reminderStart);
-  toggleStart.classList.toggle('bg-gray-300', !userProfile.reminderStart);
-  toggleStart.querySelector('.profile-toggle-handle').classList.toggle('translate-x-6', userProfile.reminderStart);
-  toggleStart.querySelector('.profile-toggle-handle').classList.toggle('translate-x-1', !userProfile.reminderStart);
-}
 
-if (toggleFertile) {
-  toggleFertile.classList.toggle('bg-pink-500', userProfile.reminderFertile);
-  toggleFertile.classList.toggle('bg-gray-300', !userProfile.reminderFertile);
-  toggleFertile.querySelector('.profile-toggle-handle').classList.toggle('translate-x-6', userProfile.reminderFertile);
-  toggleFertile.querySelector('.profile-toggle-handle').classList.toggle('translate-x-1', !userProfile.reminderFertile);
-}
-
+    // Função exclusiva para marcar menstruação no calendário
+// Função exclusiva para marcar/desmarcar menstruação no calendário
+async function markMenstruationDay(dateString) {
+  const colRef = getCycleCollectionRef();
+  try {
+    if (colRef) {
+      const dRef = doc(colRef, dateString);
+      if (loggedCycleData[dateString]) {
+        // Apaga o registro no Firestore
+        await deleteDoc(dRef);
+        delete loggedCycleData[dateString];
+      } else {
+        // Adiciona novo registro
+        await setDoc(dRef, { flow: 'start', timestamp: new Date(dateString).getTime() }, { merge: true });
+        loggedCycleData[dateString] = { flow: 'start', timestamp: new Date(dateString).getTime() };
+      }
+    } else {
+      const ls = lsGet();
+      if (ls[dateString]) {
+        delete ls[dateString]; // remove do localStorage
+      } else {
+        ls[dateString] = { flow: 'start', timestamp: new Date(dateString).getTime() };
+      }
+      lsSet(ls);
+      loggedCycleData = ls;
     }
+  } catch (err) {
+    console.error("Erro ao marcar/desmarcar dia:", err);
+    const ls = lsGet();
+    if (ls[dateString]) {
+      delete ls[dateString];
+    } else {
+      ls[dateString] = { flow: 'start', timestamp: new Date(dateString).getTime() };
+    }
+    lsSet(ls);
+    loggedCycleData = ls;
+  }
+
+  window.calculateCycleDataAndSummary();
+  window.renderCalendar();
+  window.renderCycleChart();
+}
+
+
+   function renderProfile() {
+  const nameEl = document.getElementById('profile-name');
+  const clEl = document.getElementById('profile-cycle-length');
+  const pdEl = document.getElementById('profile-period-duration');
+  const uidEl = document.getElementById('profile-user-id');
+
+  const lsName = localStorage.getItem('profile-name');
+  const lsCycle = localStorage.getItem('profile-cycle-length');
+  const lsPeriod = localStorage.getItem('profile-period-duration');
+
+  if (nameEl) {
+    nameEl.value = (lsName !== null) ? lsName : (userProfile?.name || "");
+  }
+  if (clEl) {
+    clEl.value = (lsCycle !== null) ? lsCycle : (userProfile?.cycleLength || DEFAULT_CYCLE_LENGTH);
+  }
+  if (pdEl) {
+    pdEl.value = (lsPeriod !== null) ? lsPeriod : (userProfile?.periodDuration || DEFAULT_PERIOD_DURATION);
+  }
+  if (uidEl) {
+    uidEl.textContent = userId || 'N/A';
+  }
+
+  // Toggles
+  const toggleStart = document.getElementById('toggle-reminder-start');
+  const toggleFertile = document.getElementById('toggle-reminder-fertile');
+  if (toggleStart) {
+    const on = userProfile?.reminderStart === true;
+    toggleStart.classList.toggle('bg-pink-500', on);
+    toggleStart.classList.toggle('bg-gray-300', !on);
+    const handle = toggleStart.querySelector('.profile-toggle-handle');
+    if (handle) {
+      handle.classList.toggle('translate-x-6', on);
+      handle.classList.toggle('translate-x-1', !on);
+    }
+  }
+  if (toggleFertile) {
+    const on = userProfile?.reminderFertile === true;
+    toggleFertile.classList.toggle('bg-pink-500', on);
+    toggleFertile.classList.toggle('bg-gray-300', !on);
+    const handle = toggleFertile.querySelector('.profile-toggle-handle');
+    if (handle) {
+      handle.classList.toggle('translate-x-6', on);
+      handle.classList.toggle('translate-x-1', !on);
+    }
+  }
+}
+
+
+
+
 
     function subscribeToProfile() {
       const dRef = getProfileDocRef(); if (!dRef) { renderProfile(); return; }
@@ -2509,13 +2551,11 @@ menstruationStartDate = new Date(`${dateString}T12:00:00`);
     }
 
     // EVENTO DE CLIQUE NO CALENDÁRIO
-    document.querySelectorAll('.calendar-day').forEach(day => {
-      day.addEventListener('click', () => {
+
         const dayNumber = parseInt(day.querySelector('.day-number')?.textContent);
         menstruationStartDate = new Date(currentYear, currentMonth, dayNumber);
 
-        markMenstruationDays(menstruationStartDate);
-        showNextCyclePrediction(menstruationStartDate);
+
       });
     });
 
@@ -2578,8 +2618,6 @@ const fullDate = new Date(`${isoDate}T12:00:00`);
 }
 
 function attachCalendarClickEvents() {
-  document.querySelectorAll('.calendar-day').forEach(day => {
-    day.addEventListener('click', () => {
       const dateString = day.getAttribute('data-date');
       menstruationStartDate = new Date(`${dateString}T12:00:00`);
       markMenstruationDays(menstruationStartDate);
@@ -2596,67 +2634,138 @@ function attachCalendarClickEvents() {
 
 
 
+
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  const form = document.getElementById("diario-form");
-  if (!form) return;
+    document.addEventListener("DOMContentLoaded", function () {
+      const form = document.getElementById("diario-form");
+      if (!form) return;
 
-  form.addEventListener("submit", function (e) {
-    e.preventDefault();
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
 
-    const sentimento = this.sentimento.value.trim().toLowerCase();
-    const sintomas = Array.from(this.querySelectorAll("input[name='sintomas']:checked")).map(el => el.value);
-    const emocoes = Array.from(this.querySelectorAll("input[name='emocoes']:checked")).map(el => el.value);
+        const sentimento = this.sentimento.value.trim().toLowerCase();
+        const sintomas = Array.from(this.querySelectorAll("input[name='sintomas']:checked")).map(el => el.value);
+        const emocoes = Array.from(this.querySelectorAll("input[name='emocoes']:checked")).map(el => el.value);
 
-    const resumo = `
-      🌸 Sentimento: <strong>${sentimento || "Não informado"}</strong><br>
-      💧 Sintomas: ${sintomas.length ? sintomas.join(", ") : "Nenhum"}<br>
-      🧠 Emoções: ${emocoes.length ? emocoes.join(", ") : "Nenhuma"}
-    `;
-    document.getElementById("resumo-registro").innerHTML = resumo;
+        const resumo = `
+          🌸 Sentimento: <strong>${sentimento || "Não informado"}</strong><br>
+          💧 Sintomas: ${sintomas.length ? sintomas.join(", ") : "Nenhum"}<br>
+          🧠 Emoções: ${emocoes.length ? emocoes.join(", ") : "Nenhuma"}
+        `;
+        document.getElementById("resumo-registro").innerHTML = resumo;
 
-    // Frases motivacionais com fontes diferentes
-    let mensagem = "";
-    let estilo = "font-serif text-pink-700 italic";
+        // Frases motivacionais com fontes diferentes
+        let mensagem = "";
+        let estilo = "font-serif text-pink-700 italic";
 
-    if (sentimento.includes("cansada")) {
-      mensagem = "Seu corpo está pedindo descanso. Se puder, desacelere e se abrace com carinho 💆‍♀️";
-      estilo += " text-lg";
-    } else if (sentimento.includes("triste")) {
-      mensagem = "Tudo bem não estar bem. Você é forte, mesmo nos dias nublados 🌧️💖";
-      estilo += " text-base";
-    } else if (sentimento.includes("feliz") || sentimento.includes("animada")) {
-      mensagem = "Que lindo ver você assim! Espalhe essa energia por onde passar ✨🌸";
-      estilo += " font-bold text-pink-600";
-    } else if (sentimento.includes("irritada")) {
-      mensagem = "Respira fundo. Você merece paz, mesmo quando tudo parece demais 😌🍃";
-      estilo += " text-sm";
-    } else if (sentimento.includes("ansiosa")) {
-      mensagem = "Você não precisa controlar tudo. Um passo de cada vez, com gentileza 🕊️";
-      estilo += " text-base";
-    } else if (sentimento.includes("tranquila")) {
-      mensagem = "Que delícia de calmaria. Aproveite esse momento de paz interior 🌿";
-      estilo += " text-lg font-light";
-    } else {
-      mensagem = "Obrigada por compartilhar como você está. Seu corpo e mente merecem atenção e carinho 💗";
-      estilo += " text-base";
-    }
+        if (sentimento.includes("cansada")) {
+          mensagem = "Seu corpo está pedindo descanso. Se puder, desacelere e se abrace com carinho 💆‍♀️";
+          estilo += " text-lg";
+        } else if (sentimento.includes("triste")) {
+          mensagem = "Tudo bem não estar bem. Você é forte, mesmo nos dias nublados 🌧️💖";
+          estilo += " text-base";
+        } else if (sentimento.includes("feliz") || sentimento.includes("animada")) {
+          mensagem = "Que lindo ver você assim! Espalhe essa energia por onde passar ✨🌸";
+          estilo += " font-bold text-pink-600";
+        } else if (sentimento.includes("irritada")) {
+          mensagem = "Respira fundo. Você merece paz, mesmo quando tudo parece demais 😌🍃";
+          estilo += " text-sm";
+        } else if (sentimento.includes("ansiosa")) {
+          mensagem = "Você não precisa controlar tudo. Um passo de cada vez, com gentileza 🕊️";
+          estilo += " text-base";
+        } else if (sentimento.includes("tranquila")) {
+          mensagem = "Que delícia de calmaria. Aproveite esse momento de paz interior 🌿";
+          estilo += " text-lg font-light";
+        } else {
+          mensagem = "Obrigada por compartilhar como você está. Seu corpo e mente merecem atenção e carinho 💗";
+          estilo += " text-base";
+        }
 
-    const msgEl = document.getElementById("mensagem-motivacional");
-    msgEl.innerText = mensagem;
-    msgEl.className = "mt-4 " + estilo;
+        const msgEl = document.getElementById("mensagem-motivacional");
+        msgEl.innerText = mensagem;
+        msgEl.className = "mt-4 " + estilo;
 
-    document.getElementById("registro-salvo").classList.remove("hidden");
-    this.reset();
-  });
-});
+        document.getElementById("registro-salvo").classList.remove("hidden");
+        this.reset();
+      });
+    });
+
+
+        // Carregar dados salvos ao abrir a página
+       window.onload = function() {
+         // Apelido
+         if(localStorage.getItem("profile-name")) {
+           document.getElementById("profile-name").value = localStorage.getItem("profile-name");
+         }
+         // Ciclo
+         if(localStorage.getItem("profile-cycle-length")) {
+           document.getElementById("profile-cycle-length").value = localStorage.getItem("profile-cycle-length");
+         }
+         // Menstruação
+         if(localStorage.getItem("profile-period-duration")) {
+           document.getElementById("profile-period-duration").value = localStorage.getItem("profile-period-duration");
+         }
+         // Última menstruação
+         if(localStorage.getItem("profile-last-period")) {
+           document.getElementById("profile-last-period").value = localStorage.getItem("profile-last-period");
+         }
+       }
+
+       // Salvar apelido, ciclo e menstruação
+       function saveProfile() {
+         localStorage.setItem("profile-name", document.getElementById("profile-name").value);
+         localStorage.setItem("profile-cycle-length", document.getElementById("profile-cycle-length").value);
+         localStorage.setItem("profile-period-duration", document.getElementById("profile-period-duration").value);
+       }
+
+       // Salvar última menstruação
+       function saveProfileLastPeriod() {
+         localStorage.setItem("profile-last-period", document.getElementById("profile-last-period").value);
+       }
 </script>
 
+<script>
+    // Função para salvar estado dos checkboxes
+    function saveChecklist() {
+      const items = document.querySelectorAll('#profile-view input[type="checkbox"]');
+      const estado = {};
+      items.forEach(item => {
+        estado[item.id] = item.checked;
+      });
+      localStorage.setItem('checklistEstado', JSON.stringify(estado));
+    }
+
+    // Função para restaurar estado dos checkboxes
+    function loadChecklist() {
+      const estado = JSON.parse(localStorage.getItem('checklistEstado') || '{}');
+      Object.keys(estado).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.checked = estado[id];
+      });
+    }
+
+    // Ativa salvar ao clicar
+    document.addEventListener('DOMContentLoaded', () => {
+      loadChecklist();
+      const items = document.querySelectorAll('#profile-view input[type="checkbox"]');
+      items.forEach(item => {
+        item.addEventListener('change', saveChecklist);
+      });
+    });
+</script>
 
 
 
 
 </body>
 </html>
+
+
+
+
+
+
+
+
 
 
